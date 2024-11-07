@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Costco Warehouse Growth Visualization</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" type="text/css" href="./styles.css">
 </head>
 <body>
     <h1>Costco Warehouse Growth</h1>
@@ -15,7 +15,13 @@
     <script src="script.js"></script>
 </body>
 <script type="module">
-    import define from "./index.js";
+
+import define from "./index.js";
+import {Runtime, Library, Inspector} from "./runtime.js";
+
+const runtime = new Runtime();
+const main = runtime.module(define, Inspector.into(document.body));
+
 </script>
 <!--write you D3 code here? (above)
 /or can write it in a different file (script.js)-->

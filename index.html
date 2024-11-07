@@ -8,6 +8,7 @@
 </head>
 <body>
     <h1>Costco Warehouse Growth</h1>
+    <div id="slider-container"></div>
     <div id="visualization"></div>
         <!--link to write up-->
     <p><a href="https://snehaliz.github.io/project-3-data-vis/writeup.md" target="_blank">View Project Write-Up:</a></p>
@@ -15,7 +16,108 @@
     <script src="https://cdn.jsdelivr.net/npm/topojson@3.0.2"></script>
 
     <script>
-        d3.tsv("walmart.tsv").then(function(data) {
+    // Scrubber function
+    function Scrubber(values, {
+        format = value => value,
+        initial = 0,
+        delay = null,
+        autoplay = true,
+        loop = true,
+        loopDelay = null,
+        alternate = false
+    } = {}) {
+        const form = d3.create("form")
+            .style("font", "12px var(--sans-serif)")
+            .style("font-variant-numeric", "tabular-nums")
+            .style("display", "flex")
+            .style("height", "33px")
+            .style("align-items", "center");
+
+        const button = form.append("button")
+            .attr("type", "button")
+            .style("margin-right", "0.4em")
+            .style("width", "5em")
+            .text("Play");
+
+        const label = form.append("label")
+            .style("display", "flex")
+            .style("align-items", "center");
+
+        const input = label.append("input")
+            .attr("type", "range")
+            .attr("min", 0)
+            .attr("max", values.length - 1)
+            .attr("value", initial)
+            .attr("step", 1)
+            .style("width", "180px");
+
+        const output = label.append("output")
+            .style("margin-left", "0.4em");
+
+        let frame = null;
+        let timer = null;
+        let interval = null;
+
+        function update() {
+            const i = input.node().valueAsNumber;
+            output.text(format(values[i], i, values));
+            return i;
+        }
+
+        function step() {
+            let i = update();
+            if (i === values.length - 1) {
+                i = -1;
+            }
+            input.node().value = i + 1;
+            update();
+        }
+
+        function start() {
+            button.text("Pause");
+            if (delay === null) frame = requestAnimationFrame(tick);
+            else interval = setInterval(tick, delay);
+        }
+
+        function tick() {
+            if (input.node().value === input.node().max) {
+                if (loop) {
+                    input.node().value = input.node().min;
+                } else {
+                    return stop();
+                }
+            }
+            step();
+            if (delay === null) frame = requestAnimationFrame(tick);
+        }
+
+        function stop() {
+            button.text("Play");
+            if (frame !== null) cancelAnimationFrame(frame), frame = null;
+            if (timer !== null) clearTimeout(timer), timer = null;
+            if (interval !== null) clearInterval(interval), interval = null;
+        }
+
+        function running() {
+            return frame !== null || timer !== null || interval !== null;
+        }
+
+        button.on("click", () => {
+            if (running()) return stop();
+            start();
+        });
+
+        input.on("input", () => {
+            stop();
+            update();
+        });
+
+        if (autoplay) start();
+        else update();
+
+        return Object.assign(form.node(), {update, value: input.node()});
+    }
+        d3.csv("costco_data.csv").then(function(data) {
             console.log("Raw data:", data); 
 
             if (!data || data.length === 0) {
@@ -25,13 +127,16 @@
 
             const parseDate = d3.utcParse("%m/%d/%Y");
 
-            data = data.slice(1);  // since walmart.tsv's first row is a HEADER: "0, 1, date" we skip reading first row 
+            //data = data.slice(1);  // since walmart.tsv's first row is a HEADER: "0, 1, date" we skip reading first row 
 
             // parse data, convert date to Date object, sanity check valid longitude & latitude
             data.forEach(d => {
-                d.lon = +d["0"];  // 1st col = longitude
-                d.lat = +d["1"];  // 2nd col = latitude
-                d.date = parseDate(d["date"]);  
+                d.lon = +d.longitude;
+                d.lat = +d.latitude;
+                d.date = parseDate(d.date);
+                //d.lon = +d["0"];  // 1st col = longitude
+                //d.lat = +d["1"];  // 2nd col = latitude
+                //d.date = parseDate(d["date"]);  
                 console.log(`Parsed: lon=${d.lon}, lat=${d.lat}, date=${d.date}`);
             });
 
@@ -45,7 +150,31 @@
 
             const projection = d3.geoAlbersUsa().scale(1280).translate([480, 300]);
 
-            function renderChart(validData) {
+            // Create the scrubber
+            const dates = d3.utcWeek.every(2).range(...d3.extent(validData, d => d.date));
+            const scrubber = Scrubber(dates, {
+            format: d3.utcFormat("%Y %b %-d"),
+            loop: false
+            });
+
+            // Add the scrubber to your page
+            document.getElementById('slider-container').appendChild(scrubber);
+
+            // Update visualization when scrubber value changes
+            scrubber.update = () => {
+            const date = dates[scrubber.value.valueAsNumber];
+            updateVisualization(date);
+            };
+
+            function updateVisualization(date) {
+            const filteredData = validData.filter(d => d.date <= date);
+            renderChart(filteredData);
+            }
+
+            function renderChart(data) { //validData
+                // Clear the previous visualization
+                d3.select("#visualization").html("");
+
                 const svg = d3.create("svg")
                     .attr("viewBox", [0, 0, 960, 600]);
 
@@ -97,7 +226,9 @@
                 });
             }
 
-            renderChart(validData);
+            //renderChart(validData);
+            // Initial render with all data
+            updateVisualization(d3.max(dates));
 
         }).catch(function(error) {
             console.error("Error loading the TSV file:", error);

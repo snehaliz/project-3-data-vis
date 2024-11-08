@@ -208,6 +208,7 @@
 
                     const dot = g.selectAll("circle")
                         .data(validData)
+                        //.data(data) //change this
                         .join("circle")
                         .attr("transform", d => {
                             const [x, y] = projection([d.lon, d.lat]); 

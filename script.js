@@ -17,7 +17,7 @@ Maybe add an explanation here, once working`
 //can change above
 
 function _date(Scrubber,d3,data){return(
-Scrubber(d3.utcWeek.every(2).range(...d3.extent(data, d => d.date)), {format: d3.utcFormat("%Y %b %-d"), loop: false})
+Scrubber(d3.utcDay.range(...d3.extent(data, d => d.date)), {format: d3.utcFormat("%Y %b %-d"), loop: false})
 )}
 
 function _chart(d3,topojson,us,data)
@@ -44,27 +44,56 @@ function _chart(d3,topojson,us,data)
   const dot = g.selectAll("circle")
     .data(data)
     .join("circle")
-      .attr("transform", d => `translate(${d})`);
-
-  svg.append("circle")
-      .attr("fill", "blue")
-      .attr("transform", `translate(${data[0]})`)
-      .attr("r", 3);
-
-  let previousDate = -Infinity;
-
+      .attr("transform", d => `translate(${d.x},${d.y})`)
+      .attr("r", 0)
+      .attr("fill", "red");
+    
+    // Optional: Add a blue circle for the first data point
+  //svg.append("circle")
+      //.attr("fill", "blue")
+      //.attr("transform", d => `translate(${data[0].x},${data[0].y})`)
+      //.attr("r", 3);
   return Object.assign(svg.node(), {
     update(date) {
-      dot // enter
-        .filter(d => d.date > previousDate && d.date <= date)
-        .transition().attr("r", 3);
-      dot // exit
-        .filter(d => d.date <= previousDate && d.date > date)
-        .transition().attr("r", 0);
-      previousDate = date;
-    }
-  });
-}
+      dot
+        .attr("r", d => d.date <= date ? 3 : 0)
+        .attr("opacity", d => d.date <= date ? 1 : 0);
+      }
+    });
+  }
+  //let previousDate = -Infinity;
+  ///let currentIndex = 0;
+  ///return Object.assign(svg.node(), {
+    ///update(date) {
+      ///const index = data.findIndex(d => d.date > date);
+      ///const newIndex = index === -1 ? data.length : index;
+
+      ///if (newIndex !== currentIndex) {
+        // Hide the previous dot
+        ///dot.filter((_, i) => i === currentIndex)
+          ///.transition().attr("r", 0);
+
+        // Show the new dot
+        ///dot.filter((_, i) => i === newIndex - 1)
+          ///.transition().attr("r", 3);
+
+        ///currentIndex = newIndex;
+      ///}
+    ///}
+  ///});
+///}
+  //return Object.assign(svg.node(), {
+    //update(date) {
+      //dot // enter
+        //.filter(d => d.date > previousDate && d.date <= date)
+        //.transition().attr("r", 3);
+      //dot // exit
+        //.filter(d => d.date <= previousDate && d.date > date)
+        //.transition().attr("r", 0);
+      //previousDate = date;
+    //}
+  //});
+//}
 
 
 function _update(chart,date){return(
@@ -72,16 +101,33 @@ chart.update(date)
 )}
 
 //thisis where a lot of my chnges are occuring
-async function _data(FileAttachment,projection,parseDate){return(
-(await FileAttachment("costco_data.csv").csv())
+async function _data(FileAttachment,projection,parseDate){//return(
+const csvData = (await FileAttachment("costco_data.csv").csv())
 //change this to a csv
+console.log("Raw CSV data:", csvData);
+
+  return csvData
   .map(d => {
-    const p = projection(d);
-    p.date = parseDate(d.openDate); //changed this here
-    return p;
+    const [lat, lon] = [+d.latitude, +d.longitude]; // Parse as numbers
+    const pos = projection([lon, lat]);
+    if (pos) {
+      return {
+        x: pos[0],
+        y: pos[1],
+        date: parseDate(d.date)
+      };
+    }
+    return null;
   })
-  .sort((a, b) => a.date - b.date)
-)}
+  .filter(d => d !== null && d.date) // Remove any null entries or entries with invalid dates
+  .sort((a, b) => a.date - b.date);
+}
+    //const p = projection(d);
+    //p.date = parseDate(d.date); //changed this here
+    //return p;
+  //})
+  //.sort((a, b) => a.date - b.date)
+//)}
 
 function _parseDate(d3){return(
 d3.utcParse("%m/%d/%Y")
@@ -108,7 +154,7 @@ export default function define(runtime, observer) {
   const main = runtime.module();
   function toString() { return this.url; }
   const fileAttachments = new Map([
-    ["costco_data.csv", {url: new URL("./files/costco_data.csv", import.meta.url), mimeType: "text/comma-separated-values", toString}]
+    ["costco_data.csv", {url: new URL("./costco_data.csv", import.meta.url), mimeType: "text/comma-separated-values", toString}]
   ]); //changed this here
   main.builtin("FileAttachment", runtime.fileAttachments(name => fileAttachments.get(name)));
   main.variable(observer()).define(["md"], _1);

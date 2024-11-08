@@ -11,20 +11,16 @@ uppercase;"><h1 style="display: none;">Costco Exploration</h1><a href="https://d
  <a href="/@d3/gallery">Gallery</a></div>
 
 # Costco's Growth
-
-Maybe add an explanation here, once working`
+Here you can explore the spread of Costco across the USA from September 1983 
+to March 2020. Our data set can be found on kaggle <a href="https://www.kaggle.com/datasets/mikestokholm/costco-warehouse-information">here</a>. We used these <a href="https://observablehq.com/@d3/walmarts-growth">D3 Resources</a>.
+Please note that Costco locations in Hawaii and Alaska are offset to the bottom left of the map`
 )}
-//can change above
 
 function _date(Scrubber,d3,data){
   const dateExtent = d3.extent(data, d => d.date);
   const endDate = new Date(dateExtent[1]);
-  //endDate.setDate(endDate.getDate() + 1); // Add one day to include the last date
-//return(
-//Scrubber(d3.utcDay.range(...d3.extent(data, d => d.date)), {format: d3.utcFormat("%Y %b %-d"), loop: false})
-//)}
   return Scrubber(
-  d3.utcDay.range(dateExtent[0], d3.utcDay.offset(endDate, 1)), // Use dateExtent here
+  d3.utcDay.range(dateExtent[0], d3.utcDay.offset(endDate, 1)),
   { format: d3.utcFormat("%Y %b %-d"), loop: false }
 );
 }
@@ -58,11 +54,6 @@ function _chart(d3,topojson,us,data)
       .attr("r", 0)
       .attr("fill", "red");
     
-    // Optional: Add a blue circle for the first data point
-  //svg.append("circle")
-      //.attr("fill", "blue")
-      //.attr("transform", d => `translate(${data[0].x},${data[0].y})`)
-      //.attr("r", 3);
   return Object.assign(svg.node(), {
     update(date) {
       dot
@@ -71,40 +62,6 @@ function _chart(d3,topojson,us,data)
       }
     });
   }
-
-  //let previousDate = -Infinity;
-  ///let currentIndex = 0;
-  ///return Object.assign(svg.node(), {
-    ///update(date) {
-      ///const index = data.findIndex(d => d.date > date);
-      ///const newIndex = index === -1 ? data.length : index;
-
-      ///if (newIndex !== currentIndex) {
-        // Hide the previous dot
-        ///dot.filter((_, i) => i === currentIndex)
-          ///.transition().attr("r", 0);
-
-        // Show the new dot
-        ///dot.filter((_, i) => i === newIndex - 1)
-          ///.transition().attr("r", 3);
-
-        ///currentIndex = newIndex;
-      ///}
-    ///}
-  ///});
-///}
-  //return Object.assign(svg.node(), {
-    //update(date) {
-      //dot // enter
-        //.filter(d => d.date > previousDate && d.date <= date)
-        //.transition().attr("r", 3);
-      //dot // exit
-        //.filter(d => d.date <= previousDate && d.date > date)
-        //.transition().attr("r", 0);
-      //previousDate = date;
-    //}
-  //});
-//}
 
 
 function _update(chart,date){return(
@@ -123,7 +80,6 @@ async function _data(FileAttachment, projection, parseDate) {
       const lat = +d.latitude;
       const lon = +d.longitude;
 
-      // Filter out rows w/ negative latitude values, since no USA state can have negative latitude coordinate value
       if (lat < 0) return null; 
 
       const pos = projection([lon, lat]);
@@ -141,20 +97,11 @@ async function _data(FileAttachment, projection, parseDate) {
 }
 
 
-    //const p = projection(d);
-    //p.date = parseDate(d.date); //changed this here
-    //return p;
-  //})
-  //.sort((a, b) => a.date - b.date)
-//)}
-
 function _parseDate(d3){return(
 d3.utcParse("%m/%d/%Y")
 )}
 
-function _projection(d3){return(
-    //I may have to update this to get the x and y properly 
-//d3.geoAlbersUsa().scale(1280).translate([480, 300]) //I think thsi should work, it should take longitude and latitude 
+function _projection(d3){return( 
 d3.geoAlbersUsa().scale(1280).translate([480, 300]) //I think thsi should work, it should take longitude and latitude 
 
 //and project it onto a map of the US

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Write Up</title>
+</head>
+<body>
+    <p></p>
+    
+</body>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        line-height: 1.6;
+    }
+    h1, h2 {
+        color: #333;
+    }
+    p {
+        margin: 10px 0;
+    }
+    ul {
+        margin-left: 20px;
+    }
+</style>
+</head>
+<body>
+<h1>Project Write-Up</h1>
+
+<h2>Rationale for Design Decisions</h2>
+<p>Our group sought to display the growth of Costco across the United States, over time. There are two main components to display this data-- geographic location and time data. We have an interactive bar where a user can scrub through dates from 1978 to 2020 that will display all the Costcos opened on or before this date. If the user does not interact with the time bar, it will automatically proceed in a chronological order. Our encodings are as follows:</p>
+
+<ul>
+    <li>Mark: Circle</li>
+    <li>Color: Red</li>
+    <li>X-axis: Longitude (Q-interval)</li>
+    <li>Y-axis: Latitude (Q-interval)</li>
+    <li>+ Mark: Text</li>
+    <li>X: Month, Year (Ordinal)</li>
+    <li>+ Mark: US map</li>
+    <li>Color: Grey</li>
+    <li>X: Longitude (Q-interval)</li>
+    <li>Y: Latitude (Q-interval)</li>
+</ul>
+
+<p>While just printing out the coordinates of each Costco presents a map that looks similar to the map of the US, we decided that overlaying this data on the map of the US is much more granular, explicit, and easier to interpret where certain major cities lie. However, the state lines are only included for the 48 continental states while Hawaii and Alaska Costcos are offset to the bottom left of the map, which is common in many maps. We also included a description at the top to be exceptionally clear. If we had more time for development, we would attempt to implement a map that also includes Alaska and Hawaii. Our original data included international Costcos, but we decided to focus on the US since it was the highest abundance of Costcos ranging over the longest period of time. A map of the entire world would be difficult to inspect on only one web page.</p>
+
+<p>We decided to map the circles for each Costco red as that corresponds to the logo of Costco. The color red is striking against the grey map.</p>
+
+<p>Lastly, as our main visualization is based on the chronological spread of Costco, we thought it was most fitting for the user to be able to interact with the time variable. This allows the user some insights into how the company spread both geographically and chronologically.</p>
+
+<h2>Overview of Development Process</h2>
+<p>Overall, our group was able to collaborate effectively and efficiently!</p>
+
+<p>We came up with an idea for our visualization quickly, especially due to the help of the examples on the D3 website. Our two main challenges while working on this project were (a) properly loading in and accessing our data from a CSV file and (b) making sure the circles on the map properly appeared in correspondence with the date bar. As for challenge (a), D3 provided quite good examples, but had data in a different format, so we needed to figure out how to change the data loading and properly access our CSV file. We used a lot of console.log() statements to help with debugging and make sure we were properly accessing each variable. For challenge (b), we realized we had to filter our data points each time we updated the date for them to properly match.</p>
+
+<h3>Work Completed by Each Member:</h3>
+<ul>
+    <li><strong>Joyce:</strong>
+        <ul>
+            <li>Performed data exploration, preprocessing, and data visualization on dataset file in group’s GitHub repository, in order to find which fields to extract and use for Project 3.</li>
+            <li>Tested out a Walmart sample dataset and script to ensure D3.js and GeoAlbersUSA visualization work properly in group’s repository.</li>
+            <li>Before interactive/animation step, wrote script to plot data points from CSV into the map, performed sanity checks to ensure data points were within the bounds of the USA map.</li>
+            <li>Helped work on debugging the final step of properly animating the data points. Filtered out all latitude coordinates that were negative (to strictly plot only US-based Costco stores) and filtered data to only plot starting from 1983, when the first Costco opened in WA.</li>
+        </ul>
+    </li>
+    <li><strong>Sneha:</strong>
+        <ul>
+            <li>Created the GitHub repository project-3-data-vis.</li>
+            <li>Started making and adding files for the GitHub repository such as the styles.css, index.html, script.js, writeup.md and the costco_data.csv.</li>
+            <li>Published website to GitHub pages.</li>
+            <li>Wrote code to create the slider and modified script.js file to work with costco_data CSV file.</li>
+            <li>Enabled map to show one point to all the data points as a user moves the slider from left to right.</li>
+            <li>Helped other teammates through checking and testing code and visualization when it was not working as expected.</li>
+        </ul>
+    </li>
+    <li><strong>Laura:</strong>
+        <ul>
+            <li>Found the dataset & proposed our visualization.</li>
+            <li>Filtered and cleaned original dataset while converting it from JSON to CSV, which we could use.</li>
+            <li>Introduced and explored the pseudocode we found on D3 and began to make changes relevant to our dataset and visualization.</li>
+            <li>Filtered & updated the final version of the CSV, filtering out the data points along the northern border of the US.</li>
+            <li>Wrote the write-up.</li>
+        </ul>
+    </li>
+</ul>
+
+<p>We spent about 12 hours working on this project.</p>
+
+</body>
+</html>
+
+</html>

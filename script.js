@@ -118,7 +118,12 @@ async function _data(FileAttachment, projection, parseDate) {
 
   return csvData
     .map(d => {
-      const [lat, lon] = [+d.latitude, +d.longitude]; 
+      const lat = +d.latitude;
+      const lon = +d.longitude;
+
+      // Filter out rows w/ negative latitude values, since no USA state can have negative latitude coordinate value
+      if (lat < 0) return null; 
+
       const pos = projection([lon, lat]);
       if (pos) {
         return {
@@ -132,6 +137,7 @@ async function _data(FileAttachment, projection, parseDate) {
     .filter(d => d !== null && d.date && d.date >= startDate) // Filter out ALL data before 1983-10-11
     .sort((a, b) => a.date - b.date); // Sort by date in ASC order
 }
+
 
     //const p = projection(d);
     //p.date = parseDate(d.date); //changed this here

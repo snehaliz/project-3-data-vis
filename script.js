@@ -110,27 +110,29 @@ chart.update(date)
 )}
 
 //thisis where a lot of my chnges are occuring
-async function _data(FileAttachment,projection,parseDate){//return(
-const csvData = (await FileAttachment("costco_data.csv").csv())
-//change this to a csv
-console.log("Raw CSV data:", csvData);
+async function _data(FileAttachment, projection, parseDate) {
+  const csvData = (await FileAttachment("costco_data.csv").csv());
+  console.log("Raw CSV data:", csvData);
+
+  const startDate = parseDate("10/11/1983"); // FILTER the start date @ when Kirkland, WA location first appears (1983-10-11)
 
   return csvData
-  .map(d => {
-    const [lat, lon] = [+d.latitude, +d.longitude]; // Parse as numbers
-    const pos = projection([lon, lat]);
-    if (pos) {
-      return {
-        x: pos[0],
-        y: pos[1],
-        date: parseDate(d.date)
-      };
-    }
-    return null;
-  })
-  .filter(d => d !== null && d.date) // Remove any null entries or entries with invalid dates
-  .sort((a, b) => a.date - b.date);
+    .map(d => {
+      const [lat, lon] = [+d.latitude, +d.longitude]; 
+      const pos = projection([lon, lat]);
+      if (pos) {
+        return {
+          x: pos[0],
+          y: pos[1],
+          date: parseDate(d.date)
+        };
+      }
+      return null;
+    })
+    .filter(d => d !== null && d.date && d.date >= startDate) // Filter out ALL data before 1983-10-11
+    .sort((a, b) => a.date - b.date); // Sort by date in ASC order
 }
+
     //const p = projection(d);
     //p.date = parseDate(d.date); //changed this here
     //return p;

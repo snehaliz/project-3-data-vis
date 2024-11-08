@@ -150,12 +150,13 @@
 
             const projection = d3.geoAlbersUsa().scale(1280).translate([480, 300]);
 
+
             // Create the scrubber
             const dates = d3.utcWeek.every(2).range(...d3.extent(validData, d => d.date));
             const scrubber = Scrubber(dates, {
             format: d3.utcFormat("%Y %b %-d"),
             loop: false
-            });
+          });
 
             // Add the scrubber to your page
             document.getElementById('slider-container').appendChild(scrubber);
@@ -169,7 +170,7 @@
             function updateVisualization(date) {
             const filteredData = validData.filter(d => d.date <= date);
             renderChart(filteredData);
-            }
+}
 
             function renderChart(data) { //validData
                 // Clear the previous visualization
@@ -219,7 +220,8 @@
                                 return null;  
                             }
                         })
-                        .attr("r", 3);
+                        .attr("r", 3)
+                        .attr("fill", "red");
 
                     document.getElementById("visualization").appendChild(svg.node());
                 }).catch(function(error) {

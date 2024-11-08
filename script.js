@@ -16,9 +16,18 @@ Maybe add an explanation here, once working`
 )}
 //can change above
 
-function _date(Scrubber,d3,data){return(
-Scrubber(d3.utcDay.range(...d3.extent(data, d => d.date)), {format: d3.utcFormat("%Y %b %-d"), loop: false})
-)}
+function _date(Scrubber,d3,data){
+  const dateExtent = d3.extent(data, d => d.date);
+  const endDate = new Date(dateExtent[1]);
+  //endDate.setDate(endDate.getDate() + 1); // Add one day to include the last date
+//return(
+//Scrubber(d3.utcDay.range(...d3.extent(data, d => d.date)), {format: d3.utcFormat("%Y %b %-d"), loop: false})
+//)}
+  return Scrubber(
+  d3.utcDay.range(dateExtent[0], d3.utcDay.offset(endDate, 1)), // Use dateExtent here
+  { format: d3.utcFormat("%Y %b %-d"), loop: false }
+);
+}
 
 function _chart(d3,topojson,us,data)
 {

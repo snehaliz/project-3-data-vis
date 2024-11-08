@@ -46,6 +46,7 @@ function _chart(d3,topojson,us,data)
       .attr("stroke-linejoin", "round")
       .attr("d", d3.geoPath());
 
+
   const g = svg.append("g")
       .attr("fill", "none")
       .attr("stroke", "black");
@@ -70,6 +71,7 @@ function _chart(d3,topojson,us,data)
       }
     });
   }
+
   //let previousDate = -Infinity;
   ///let currentIndex = 0;
   ///return Object.assign(svg.node(), {
@@ -114,7 +116,7 @@ async function _data(FileAttachment, projection, parseDate) {
   const csvData = (await FileAttachment("costco_data.csv").csv());
   console.log("Raw CSV data:", csvData);
 
-  const startDate = parseDate("10/11/1983"); // FILTER the start date @ when Kirkland, WA location first appears (1983-10-11)
+  const startDate = parseDate("9/15/1983"); // FILTER the start date @ when Kirkland, WA location first appears (1983-10-11)
 
   return csvData
     .map(d => {
@@ -152,7 +154,9 @@ d3.utcParse("%m/%d/%Y")
 
 function _projection(d3){return(
     //I may have to update this to get the x and y properly 
+//d3.geoAlbersUsa().scale(1280).translate([480, 300]) //I think thsi should work, it should take longitude and latitude 
 d3.geoAlbersUsa().scale(1280).translate([480, 300]) //I think thsi should work, it should take longitude and latitude 
+
 //and project it onto a map of the US
 )}
 
